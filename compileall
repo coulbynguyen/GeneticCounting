@@ -1,0 +1,2 @@
+#!/bin/bash
+g++ trainbaccarat.cpp -fopenmp -lm -o train
