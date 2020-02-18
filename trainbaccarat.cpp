@@ -352,17 +352,17 @@ int main(){
 
 
       }
-      cout << "********************" << endl;
+      // cout << "********************" << endl;
       for(int i = 0; i < 16; i++){
-        cout << my_gamblers[i].moneyleft << endl;
+        // cout << my_gamblers[i].moneyleft << endl;
         my_gamblers[i].add_to_total_10_shoes();
       }
 
     }
-  cout << "===============" << endl;
-  for(int i = 0; i < 16; i++){
-    cout << my_gamblers[i].get_average_over_10_shoes() << endl;
-  }
+  // cout << "===============" << endl;
+  // for(int i = 0; i < 16; i++){
+  //   cout << my_gamblers[i].get_average_over_10_shoes() << endl;
+  // }
   // }
   sort(my_gamblers.begin(), my_gamblers.end(), tumsort);
   cout << "#################" << endl;
