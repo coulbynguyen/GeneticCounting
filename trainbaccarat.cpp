@@ -6,8 +6,8 @@
 #include <math.h>
 #include <bits/stdc++.h>
 #include <omp.h>
-
-
+#include "gambler.h"
+#include <vector>
 using namespace std;
 
 
@@ -257,37 +257,35 @@ int sumofarray(int *myarray, int size, int type){
     return total;
 }
 
-int main(){
-    omp_set_num_threads(8);
-    ifstream arr_deck_file[8];
-    arr_deck_file[0].open("deck_file1");
-    arr_deck_file[1].open("deck_file2");
-    arr_deck_file[2].open("deck_file3");
-    arr_deck_file[3].open("deck_file4");
-    arr_deck_file[4].open("deck_file5");
-    arr_deck_file[5].open("deck_file6");
-    arr_deck_file[6].open("deck_file7");
-    arr_deck_file[7].open("deck_file8");
+bool tumsort(gambler a, gambler b){
+  return a.get_average_over_10_shoes() > b.get_average_over_10_shoes();
+}
 
-    ofstream arr_train[8];
-    arr_train[0].open("trainingdata1.txt", ios::app);
-    arr_train[1].open("trainingdata2.txt", ios::app);
-    arr_train[2].open("trainingdata3.txt", ios::app);
-    arr_train[3].open("trainingdata4.txt", ios::app);
-    arr_train[4].open("trainingdata5.txt", ios::app);
-    arr_train[5].open("trainingdata6.txt", ios::app);
-    arr_train[6].open("trainingdata7.txt", ios::app);
-    arr_train[7].open("trainingdata8.txt", ios::app);
-    // ofstream testBanker;
-    // testBanker.open("testingdataBanker.txt", ios::app);
-    //
-    // ofstream testPlayer;
-    // testPlayer.open("testingdataPlayer.txt", ios::app);
-    //
-    // ofstream testTie;
-    // testTie.open("testingdataTie.txt", ios::app);
-    #pragma omp parallel for default(none) shared(arr_train, arr_deck_file)
-    for(int loop = 0; loop < 8; loop++){
+int main(){
+    ifstream deck_file[10];
+    deck_file[0].open("deck_file0");
+    deck_file[1].open("deck_file1");
+    deck_file[2].open("deck_file2");
+    deck_file[3].open("deck_file3");
+    deck_file[4].open("deck_file4");
+    deck_file[5].open("deck_file5");
+    deck_file[6].open("deck_file6");
+    deck_file[7].open("deck_file7");
+    deck_file[8].open("deck_file8");
+    deck_file[9].open("deck_file9");
+
+
+    vector<gambler> my_gamblers;
+    for(int i = 0; i < 16; i++){
+      gambler temp_gambler(i);
+      my_gamblers.push_back(temp_gambler);
+    }
+    for(int iloop = 0; iloop < 10; iloop++){
+      for(int i = 0; i < 16; i++){
+        my_gamblers[i].reset_count();
+        my_gamblers[i].reset_money();
+      }
+
       srand(time(NULL));
 
 
@@ -310,7 +308,7 @@ int main(){
 
       //Get the shoe information from the deck file
       for(int i = 0; i < 416; i++){
-          arr_deck_file[loop] >> shoe[i];
+          deck_file[iloop] >> shoe[i];
       }
 
       //Randomize when the red card will occur it should occur around one deck from the end of the game
@@ -323,31 +321,66 @@ int main(){
       else{
         top_of_deck = shoe[0] + 1;
       }
+      for(int i = 0; i < 16; i++){
+        my_gamblers[i].adjust_count(shoe[0]);
+      }
       cards_in_deck[shoe[0]]++;
       // int count = 0;
 
       while(top_of_deck < 416-red_card){
 
-
-          int result = playhand(top_of_deck, shoe, card_count, num_player_cards_drawn, num_banker_cards_drawn, player_cards, banker_cards);
-          if(result != 2){
-            for(int i = 0; i < 10; i++){
-              arr_train[loop] << cards_in_deck[i] << " ";
-            }
-            arr_train[loop] << result << endl;
+          for(int i = 0; i < 16; i++){
+            my_gamblers[i].choose_bet();
           }
+          int result = playhand(top_of_deck, shoe, card_count, num_player_cards_drawn, num_banker_cards_drawn, player_cards, banker_cards);
+          // if(result != 2){
+          //   for(int i = 0; i < 10; i++){
+          //     arr_train[loop] << cards_in_deck[i] << " ";
+          //   }
+          //   arr_train[loop] << result << endl;
+          // }
           for(int i = 0; i < num_player_cards_drawn; i++){
-            // arr_train[loop] << player_cards[i] << " ";
             cards_in_deck[player_cards[i]]++;
           }
-          // arr_train[loop] << "||";
           for(int i = 0; i < num_banker_cards_drawn; i++){
-            // arr_train[loop] << banker_cards[i] << " ";
             cards_in_deck[banker_cards[i]]++;
           }
-          // arr_train[loop] << endl;
-          // count++;
+          for(int i = 0; i < 16; i++){
+            my_gamblers[i].adjust_count(num_banker_cards_drawn, banker_cards, num_player_cards_drawn, player_cards);
+            my_gamblers[i].payout(result);
+          }
+
+
       }
+      cout << "********************" << endl;
+      for(int i = 0; i < 16; i++){
+        cout << my_gamblers[i].moneyleft << endl;
+        my_gamblers[i].add_to_total_10_shoes();
+      }
+
+    }
+  cout << "===============" << endl;
+  for(int i = 0; i < 16; i++){
+    cout << my_gamblers[i].get_average_over_10_shoes() << endl;
   }
+  // }
+  sort(my_gamblers.begin(), my_gamblers.end(), tumsort);
+  cout << "#################" << endl;
+  for(int i = 0; i < 16; i++){
+    cout << my_gamblers[i].get_average_over_10_shoes() << endl;
+  }
+  int file_counter = 0;
+  for(int i = 0; i < 4; i++){
+    for(int j = 0; j < 4; j++){
+      if(i != j){
+        my_gamblers[i].crossbreed(my_gamblers[j], file_counter);
+        file_counter++;
+      }
+    }
+  }
+  my_gamblers[0].carryover(12);
+  my_gamblers[1].carryover(13);
+  my_gamblers[2].carryover(14);
+  my_gamblers[3].carryover(15);
   return 0;
 }

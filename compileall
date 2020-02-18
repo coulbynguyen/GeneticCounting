@@ -1,2 +1,2 @@
 #!/bin/bash
-g++ trainbaccarat.cpp -fopenmp -lm -o train
+g++ -std=c++11 trainbaccarat.cpp gambler.cpp -fopenmp -lm -o train
