@@ -16,7 +16,7 @@ int comparehands(int player_total, int banker_total){
     //0 represents that a player has won
     if(player_total > banker_total){
         // cout << player_total << " > " << banker_total << endl;
-        return -1;
+        return 0;
 
     }
     //1 represents that a banker has won
@@ -330,7 +330,7 @@ int main(){
       while(top_of_deck < 416-red_card){
 
           for(int i = 0; i < 16; i++){
-            my_gamblers[i].choose_bet();
+            my_gamblers[i].choose_bet(float(416-top_of_deck));
           }
           int result = playhand(top_of_deck, shoe, card_count, num_player_cards_drawn, num_banker_cards_drawn, player_cards, banker_cards);
           // if(result != 2){

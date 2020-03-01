@@ -20,7 +20,7 @@ gambler::gambler(int file_num){
     genetics >> mycounts[i];
   }
   current_count = 0;
-  bet_amount = 10;
+  bet_amount = 100;
   bet_choice = -1;
   moneyleft = 5000.0;
   total_money_over_10_shoes = 0.0;
@@ -35,19 +35,21 @@ void gambler::reset_count(){
   current_count = 0;
 }
 
-int gambler::choose_bet(){
+int gambler::choose_bet(float cards_left){
   if(moneyleft - bet_amount < 0){
     bet_amount = moneyleft;
   }
-  if(current_count > 300){
+  //if the true count is above 0 bet banker
+  if(((float)current_count)/(cards_left/52.0) > 0){
     bet_choice = 1;
   }
-  else if(current_count < -300){
+  //if the true count is below -0 bet player
+  else if(((float)current_count)/(cards_left/52.0) < 0){
     bet_choice = 0;
   }
   else{
     bet_choice = -1;
-    moneyleft -= 7.5;
+    //moneyleft -= 7.5;
   }
   return bet_choice;
 }
@@ -65,7 +67,12 @@ void gambler::payout(int winner){
     moneyleft += 0;
   }
   else{
-    moneyleft -= bet_amount;
+    if(moneyleft - bet_amount <= 0){
+        moneyleft = 0;
+    }
+    else{
+        moneyleft -= bet_amount;
+    }
   }
 }
 
@@ -93,7 +100,7 @@ void gambler::adjust_count(int num_banker_cards_drawn, int banker_cards[], int n
 void gambler::crossbreed(gambler bottom, int file_num){
   int newbreed[10];
   vector<int> positions;
-  srand(time(NULL));
+  //srand(time(NULL));
 
   for(int i = 0; i < 5; i++){
     newbreed[i] = mycounts[i];
@@ -101,7 +108,7 @@ void gambler::crossbreed(gambler bottom, int file_num){
   for(int i = 5; i < 10; i++){
     newbreed[i] = bottom.mycounts[i];
   }
-  while(positions.size() != 10){
+  while(positions.size() != 4){
     int mutation_pos = rand()%10;
     if(find(positions.begin(), positions.end(), mutation_pos) == positions.end()){
       positions.push_back(mutation_pos);
@@ -111,10 +118,10 @@ void gambler::crossbreed(gambler bottom, int file_num){
   for(int i = 0; i < positions.size(); i++){
     int mutated_val = newbreed[positions[i]];
     if(rand()%2 == 0){
-      mutated_val += rand()%10+1;
+        mutated_val = rand()%500+1;
     }
     else{
-      mutated_val -= rand()%10+1;
+      mutated_val = -rand()%500-1;
     }
     newbreed[positions[i]] = mutated_val;
   }

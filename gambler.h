@@ -18,7 +18,7 @@ class gambler{
     gambler(int);
     void reset_money();
     void reset_count();
-    int choose_bet();
+    int choose_bet(float);
     void payout(int);
     void add_to_total_10_shoes();
     float get_average_over_10_shoes();
