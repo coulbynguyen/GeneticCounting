@@ -20,15 +20,15 @@ gambler::gambler(int file_num){
     genetics >> mycounts[i];
   }
   current_count = 0;
-  bet_amount = 100;
+  bet_amount = 15;
   bet_choice = -1;
-  moneyleft = 5000.0;
+  moneyleft = 300.0;
   total_money_over_10_shoes = 0.0;
   genetics.close();
 }
 
 void gambler::reset_money(){
-  moneyleft = 5000.0;
+  moneyleft = 300.0;
 }
 
 void gambler::reset_count(){
@@ -40,11 +40,11 @@ int gambler::choose_bet(float cards_left){
     bet_amount = moneyleft;
   }
   //if the true count is above 0 bet banker
-  if(((float)current_count)/(cards_left/52.0) > 0){
+  if(((float)current_count)/(cards_left/52.0) < 0){
     bet_choice = 1;
   }
   //if the true count is below -0 bet player
-  else if(((float)current_count)/(cards_left/52.0) < 0){
+  else if(((float)current_count)/(cards_left/52.0) > 0){
     bet_choice = 0;
   }
   else{
